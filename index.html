@@ -2900,9 +2900,9 @@
         class Storage {
             /**
              * Set a secure cookie with expiration.
-             * @param {string} key 
-             * @param {string} val 
-             * @param {number} days 
+             * @param {string} key
+             * @param {string} val
+             * @param {number} days
              */
             static set(key, val, days = 365) {
                 const d = new Date();
@@ -2912,7 +2912,7 @@
 
             /**
              * Retrieve cookie by key.
-             * @param {string} key 
+             * @param {string} key
              * @returns {string|null}
              */
             static get(key) {
@@ -3369,7 +3369,7 @@
                     document.body.classList.remove('glitching');
 
                     // Open Mail Client
-                    const email = "work21bby7@gmail.com";
+                    const email = "support@titaniumclock.com";
                     const subject = "Titanium Clock Bug Report";
                     const body = `Description of issue:%0D%0A%0D%0A%0D%0A----------------%0D%0ADevice: ${navigator.userAgent}`;
 
@@ -3784,25 +3784,7 @@
             static scrambleInterval = null;
 
             static init() {
-                // Shake Detection (Mobile)
-                let lastX = 0, lastY = 0, lastZ = 0;
-                let lastUpdate = 0;
-                const threshold = 20;
-
-                window.addEventListener('devicemotion', (e) => {
-                    const now = Date.now();
-                    if ((now - lastUpdate) > 100) {
-                        const { x, y, z } = e.accelerationIncludingGravity || { x: 0, y: 0, z: 0 };
-                        if (!x) return;
-
-                        const diff = Math.abs(x + y + z - lastX - lastY - lastZ);
-                        if (diff > threshold) {
-                            this.trigger();
-                        }
-                        lastX = x; lastY = y; lastZ = z;
-                        lastUpdate = now;
-                    }
-                });
+                // Shake detection logic consolidated in ShakeDetector class
             }
 
             static trigger() {
@@ -4152,7 +4134,7 @@ DESCRIBE ISSUE BELOW:
         class UI {
             /**
              * Robust Modal Toggling Logic (Fix applied in v5.1)
-             * @param {string} id 
+             * @param {string} id
              */
             static toggleModal(id) {
                 const el = document.getElementById('modal-' + id);
@@ -4401,9 +4383,9 @@ DESCRIBE ISSUE BELOW:
                 ampm = h >= 12 ? 'PM' : 'AM';
                 const displayH = h % 12 || 12;
 
-                const timeStr = `${displayH}:${this.pad(m)}:${this.pad(s)}`;
+                const timeStr = `${this.pad(displayH)}:${this.pad(m)}:${this.pad(s)}`;
 
-                UI.renderFlip('Hours', String(displayH));
+                UI.renderFlip('Hours', this.pad(displayH));
                 UI.renderFlip('Minutes', this.pad(m));
                 UI.renderFlip('Seconds', this.pad(s));
 
@@ -4535,9 +4517,15 @@ DESCRIBE ISSUE BELOW:
                             if (m === 'stopwatch') {
                                 UI.renderFlip('Hours', '00'); UI.renderFlip('Minutes', '00'); UI.renderFlip('Seconds', '00');
                             } else if (m === 'timer') {
-                                let d = st.total; UI.renderFlip('Minutes', this.pad(Math.floor(d / 60000))); UI.renderFlip('Seconds', '00');
+                                let d = st.total;
+                                UI.renderFlip('Hours', this.pad(Math.floor(d / 3600000)));
+                                UI.renderFlip('Minutes', this.pad(Math.floor(d / 60000) % 60));
+                                UI.renderFlip('Seconds', '00');
                             } else if (m === 'pomodoro') {
-                                let d = st.work; UI.renderFlip('Minutes', this.pad(Math.floor(d / 60000))); UI.renderFlip('Seconds', '00');
+                                let d = st.work;
+                                UI.renderFlip('Hours', this.pad(Math.floor(d / 3600000)));
+                                UI.renderFlip('Minutes', this.pad(Math.floor(d / 60000) % 60));
+                                UI.renderFlip('Seconds', '00');
                             }
                         }
                     }
