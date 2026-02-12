@@ -3829,25 +3829,56 @@
 
             static generateReport() {
                 const ua = navigator.userAgent;
-                const screen = `${window.screen.width}x${window.screen.height}`;
+                const winSize = `${window.innerWidth}x${window.innerHeight}`;
+                const screenRes = `${window.screen.width}x${window.screen.height}`;
                 const time = new Date().toISOString();
                 const platform = navigator.platform;
                 const vendor = navigator.vendor || 'Unknown';
                 const cores = navigator.hardwareConcurrency || '?';
                 const mem = navigator.deviceMemory || '?';
+                const lang = navigator.language;
+                const online = navigator.onLine;
+                const cookies = navigator.cookieEnabled;
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const dpr = window.devicePixelRatio;
+                const visibility = document.visibilityState;
+
+                // App State
+                const mode = Engine.mode;
+                const swActive = Engine.store.stopwatch.active;
+                const timerActive = Engine.store.timer.active;
+                const pomoActive = Engine.store.pomodoro.active;
 
                 return `
-[AUTOMATED FAILURE REPORT]
--------------------------
+[TITANIUM CLOCK - ADVANCED FAILURE REPORT]
+-----------------------------------------
 TIMESTAMP: ${time}
-PLATFORM: ${platform}
-VENDOR: ${vendor}
-Hardware: ${cores} Cores, ${mem}GB RAM
-SCREEN: ${screen}
-USER_AGENT: ${ua}
--------------------------
-ERROR_CODE: MATRIX_0x99
-DESCRIBE ISSUE BELOW:
+TIMEZONE:  ${tz}
+
+DEVICE INFO:
+- Platform:  ${platform}
+- Vendor:    ${vendor}
+- Hardware:  ${cores} Cores, ${mem}GB RAM
+- Screen:    ${screenRes} (DPR: ${dpr})
+- Window:    ${winSize}
+- Language:  ${lang}
+- User Agent: ${ua}
+
+ENVIRONMENT:
+- Online:    ${online}
+- Cookies:   ${cookies}
+- Visibility: ${visibility}
+
+APP STATE:
+- Current Mode: ${mode}
+- Stopwatch:    ${swActive ? 'RUNNING' : 'IDLE'}
+- Timer:        ${timerActive ? 'RUNNING' : 'IDLE'}
+- Pomodoro:     ${pomoActive ? 'RUNNING' : 'IDLE'}
+
+-----------------------------------------
+ERROR_CODE: MATRIX_BRAVO_INF
+DESCRIBE THE STEPS TO REPRODUCE BELOW:
+-----------------------------------------
 `;
             }
 
