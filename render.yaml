@@ -1,0 +1,6 @@
+services:
+  - type: static
+    name: titanium-clock-infinity
+    env: static
+    buildCommand: true
+    publishPath: ./
