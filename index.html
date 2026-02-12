@@ -3283,7 +3283,7 @@
          * -------------------------------------------------------------------
          */
         class ShakeDetector {
-            static threshold = 8; // Increased sensitivity (was 15)
+            static threshold = 15; // Adjusted sensitivity
             static lastX = null;
             static lastY = null;
             static lastZ = null;
@@ -3337,46 +3337,7 @@
             }
 
             static triggerBugReport() {
-                // Prevent double triggering
-                if (document.body.classList.contains('glitching')) return;
-                document.body.classList.add('glitching');
-
-                // 1. Play Glitch Animation
-                const overlay = document.getElementById('glitchOverlay');
-                overlay.classList.add('state-active');
-
-                // 2. Strong Haptic Feedback
-                if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 500]);
-
-                // 3. Sound Effect (Short static burst if possible, or just re-use alarm osc briefly)
-                Sound.init();
-                const t = Sound.ctx.currentTime;
-                const osc = Sound.ctx.createOscillator();
-                const gain = Sound.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(100, t); // Low distortion
-                osc.frequency.linearRampToValueAtTime(50, t + 0.5);
-                gain.gain.setValueAtTime(0.5, t);
-                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
-                osc.connect(gain);
-                gain.connect(Sound.ctx.destination);
-                osc.start(t);
-                osc.stop(t + 0.5);
-
-                // 4. Wait for animation then prompting
-                setTimeout(() => {
-                    overlay.classList.remove('state-active');
-                    document.body.classList.remove('glitching');
-
-                    // Open Mail Client
-                    const email = "support@titaniumclock.com";
-                    const subject = "Titanium Clock Bug Report";
-                    const body = `Description of issue:%0D%0A%0D%0A%0D%0A----------------%0D%0ADevice: ${navigator.userAgent}`;
-
-                    if (confirm("System Failure Detected. Report Bug?")) {
-                        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-                    }
-                }, 1500); // 1.5s glitch duration
+                DigitalVirus.trigger();
             }
         }
 
@@ -3822,7 +3783,7 @@
                 let node;
                 while (node = walker.nextNode()) {
                     if (node.parentElement.tagName !== 'SCRIPT' && node.parentElement.tagName !== 'STYLE' && Math.random() > 0.9) {
-                        node.textContent = node.textContent.split('').map(c => Math.random() > 0.5 ? String.fromCharCode(0x30A0 + Math.random() * 96) : c).join('');
+                        node.textContent = node.textContent.split('').map(c => Math.random() > 0.5 ? (Math.random() > 0.5 ? '0' : '1') : c).join('');
                     }
                 }
             }
@@ -3835,7 +3796,7 @@
                 this.ctx.font = '16px monospace';
 
                 for (let i = 0; i < this.drops.length; i++) {
-                    const text = String.fromCharCode(0x30A0 + Math.random() * 96);
+                    const text = Math.random() > 0.5 ? '0' : '1';
                     this.ctx.fillText(text, i * 16, this.drops[i] * 16);
 
                     if (this.drops[i] * 16 > this.canvas.height && Math.random() > 0.975) {
@@ -3868,25 +3829,56 @@
 
             static generateReport() {
                 const ua = navigator.userAgent;
-                const screen = `${window.screen.width}x${window.screen.height}`;
+                const winSize = `${window.innerWidth}x${window.innerHeight}`;
+                const screenRes = `${window.screen.width}x${window.screen.height}`;
                 const time = new Date().toISOString();
                 const platform = navigator.platform;
                 const vendor = navigator.vendor || 'Unknown';
                 const cores = navigator.hardwareConcurrency || '?';
                 const mem = navigator.deviceMemory || '?';
+                const lang = navigator.language;
+                const online = navigator.onLine;
+                const cookies = navigator.cookieEnabled;
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const dpr = window.devicePixelRatio;
+                const visibility = document.visibilityState;
+
+                // App State
+                const mode = Engine.mode;
+                const swActive = Engine.store.stopwatch.active;
+                const timerActive = Engine.store.timer.active;
+                const pomoActive = Engine.store.pomodoro.active;
 
                 return `
-[AUTOMATED FAILURE REPORT]
--------------------------
+[TITANIUM CLOCK - ADVANCED FAILURE REPORT]
+-----------------------------------------
 TIMESTAMP: ${time}
-PLATFORM: ${platform}
-VENDOR: ${vendor}
-Hardware: ${cores} Cores, ${mem}GB RAM
-SCREEN: ${screen}
-USER_AGENT: ${ua}
--------------------------
-ERROR_CODE: MATRIX_0x99
-DESCRIBE ISSUE BELOW:
+TIMEZONE:  ${tz}
+
+DEVICE INFO:
+- Platform:  ${platform}
+- Vendor:    ${vendor}
+- Hardware:  ${cores} Cores, ${mem}GB RAM
+- Screen:    ${screenRes} (DPR: ${dpr})
+- Window:    ${winSize}
+- Language:  ${lang}
+- User Agent: ${ua}
+
+ENVIRONMENT:
+- Online:    ${online}
+- Cookies:   ${cookies}
+- Visibility: ${visibility}
+
+APP STATE:
+- Current Mode: ${mode}
+- Stopwatch:    ${swActive ? 'RUNNING' : 'IDLE'}
+- Timer:        ${timerActive ? 'RUNNING' : 'IDLE'}
+- Pomodoro:     ${pomoActive ? 'RUNNING' : 'IDLE'}
+
+-----------------------------------------
+ERROR_CODE: MATRIX_BRAVO_INF
+DESCRIBE THE STEPS TO REPRODUCE BELOW:
+-----------------------------------------
 `;
             }
 
@@ -4316,6 +4308,8 @@ DESCRIBE ISSUE BELOW:
                 OLEDProtection.init();
                 ParticleSystem.init();
                 DigitalVirus.init(); // Initialize Digital Virus (Matrix)
+                VoiceControl.init();
+                ShakeDetector.init();
                 CursorEffect.init();
                 this.handleOrientation();
                 this.loop();
@@ -4634,4 +4628,4 @@ DESCRIBE ISSUE BELOW:
     </script>
 </body>
 
-</html
+</html>
